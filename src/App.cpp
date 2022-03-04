@@ -91,13 +91,7 @@ void App::Load()
   // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
   glBindVertexArray(0);
 
-  glUniform1i(glGetUniformLocation(shader.GetProgramID(), "texture1"), 0);
-  glUniform1i(glGetUniformLocation(shader.GetProgramID(), "texture2"), 1);
-
-  // wireframe
-  // glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-  // fill
-  // glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
+  glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void App::Loop()
@@ -127,11 +121,8 @@ void App::Draw()
   // be sure to activate the shader before any calls to glUniform
   shader.Use();
 
-  // update shader uniform
-  //double  timeValue = SDL_GetTicks() / 1000;
-  //float greenValue = static_cast<float>(sin(timeValue) / 2.0 + 0.5);
-  //int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-  //glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+  glUniform1i(glGetUniformLocation(shader.GetProgramID(), "texture1"), 0);
+  glUniform1i(glGetUniformLocation(shader.GetProgramID(), "texture2"), 1);
 
   // render the triangle
   glBindVertexArray(VAO);

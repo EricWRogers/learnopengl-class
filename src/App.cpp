@@ -14,7 +14,7 @@ void App::Run()
   if (appState == AppState::ON)
     Engine::FatalError("App already running.");
   
-  previousTime =  std::chrono::high_resolution_clock::now();
+  previousTime = std::chrono::high_resolution_clock::now();
 
   Engine::Init();
 

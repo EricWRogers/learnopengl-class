@@ -15,6 +15,13 @@
 #include "Engine/InputManager.hpp"
 #include "Engine/Data/GLTexture.hpp"
 
+#ifdef __linux__
+using namespace std::chrono::_V2;
+#elif _WIN32
+using namespace std::chrono;
+#else
+#endif
+
 enum AppState
 {
     ON,
@@ -44,6 +51,10 @@ private:
 
     Engine::Shader shader;
 
+    Engine::Camera camera = Engine::Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+    Engine::InputManager inputManager;
+
     // move out to external class
     unsigned int vertexShader;
     unsigned int shaderProgram;
@@ -52,8 +63,8 @@ private:
     Engine::GLTexture texture1 = {};
     Engine::GLTexture texture2 = {};
 
-    std::chrono::steady_clock::time_point currentTime;
-    std::chrono::steady_clock::time_point previousTime;
+    high_resolution_clock::time_point currentTime;
+    high_resolution_clock::time_point previousTime;
 
     double deltaTime;
 

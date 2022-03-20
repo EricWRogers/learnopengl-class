@@ -75,7 +75,7 @@ void App::Run()
   if (appState == AppState::ON)
     Engine::FatalError("App already running.");
   
-  previousTime = std::chrono::high_resolution_clock::now();
+  previousTime = high_resolution_clock::now();
 
   Engine::Init();
 
@@ -136,13 +136,15 @@ void App::Load()
   glBindVertexArray(0);
 
   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
+
+  previousTime = high_resolution_clock::now();
 }
 
 void App::Loop()
 {
   while (appState == AppState::ON)
   {
-    currentTime = std::chrono::high_resolution_clock::now();
+    currentTime = high_resolution_clock::now();
     deltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - previousTime).count() / 1000000000.0;
     previousTime = currentTime;
     Engine::Log(std::to_string(deltaTime));
@@ -156,7 +158,28 @@ void App::Loop()
     InputUpdate();
   }
 }
-void App::Update() {}
+void App::Update()
+{
+  if (inputManager.isKeyPressed(SDLK_w))
+  {
+    camera.ProcessKeyboard(Engine::Camera_Movement::FORWARD, deltaTime);
+  }
+
+  if (inputManager.isKeyPressed(SDLK_s))
+  {
+    camera.ProcessKeyboard(Engine::Camera_Movement::BACKWARD, deltaTime);
+  }
+
+  if (inputManager.isKeyPressed(SDLK_a))
+  {
+    camera.ProcessKeyboard(Engine::Camera_Movement::LEFT, deltaTime);
+  }
+
+  if (inputManager.isKeyPressed(SDLK_d))
+  {
+    camera.ProcessKeyboard(Engine::Camera_Movement::RIGHT, deltaTime);
+  }
+}
 void App::Draw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -176,8 +199,8 @@ void App::Draw()
   glm::mat4 view = glm::mat4(1.0f);
   glm::mat4 projection = glm::mat4(1.0f);
 
-  projection = glm::perspective(glm::radians(45.0f), (float)window.GetScreenWidth()/(float)window.GetScreenHeight(), 0.1f, 100.0f);
-  view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
+  projection = glm::perspective(glm::radians(camera.Zoom), (float)window.GetScreenWidth()/(float)window.GetScreenHeight(), 0.1f, 100.0f);
+  view = camera.GetViewMatrix();
 
   glUniformMatrix4fv(glGetUniformLocation(shader.GetProgramID(),"projection"), 1, GL_FALSE, glm::value_ptr(projection));
   glUniformMatrix4fv(glGetUniformLocation(shader.GetProgramID(),"view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -212,10 +235,16 @@ void App::InputUpdate()
       appState = AppState::OFF;
       break;
     case SDL_MOUSEMOTION:
+      camera.ProcessMouseMovement(
+        event.motion.xrel,
+        -event.motion.yrel
+      );
       break;
     case SDL_KEYUP:
+      inputManager.releasedKey(event.key.keysym.sym);
       break;
     case SDL_KEYDOWN:
+      inputManager.pressKey(event.key.keysym.sym);
       break;
     }
   }

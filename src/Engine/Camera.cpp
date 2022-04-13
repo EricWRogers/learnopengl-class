@@ -82,4 +82,4 @@ namespace Engine
         Up = glm::normalize(glm::cross(Right, Front));
     }
 
-} // end of Canis namespace
+} // end of Engine namespace

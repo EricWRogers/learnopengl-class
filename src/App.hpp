@@ -57,6 +57,10 @@ private:
 
     Engine::InputManager inputManager;
 
+    Engine::Camera camera = Engine::Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+    Engine::InputManager inputManager;
+
     // move out to external class
     unsigned int vertexShader;
     unsigned int shaderProgram;

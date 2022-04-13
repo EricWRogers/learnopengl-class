@@ -1,5 +1,6 @@
 #include "App.hpp"
 
+
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
@@ -129,8 +130,11 @@ App::~App()
 
 void App::Run()
 {
-    if (appState == AppState::ON)
-        Engine::FatalError("App already running.");
+
+  if (appState == AppState::ON)
+    Engine::FatalError("App already running.");
+  
+  previousTime = high_resolution_clock::now();
 
     Engine::Init();
 
@@ -157,6 +161,7 @@ void App::Load()
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
 
+
     // build and compile our shader program
     lightingShader.Compile("assets/shaders/6.multiple_lights.vs", "assets/shaders/6.multiple_lights.fs");
     lightingShader.AddAttribute("aPos");
@@ -176,6 +181,7 @@ void App::Load()
 
     glBindVertexArray(cubeVAO);
 
+
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -186,6 +192,7 @@ void App::Load()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
+
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
     glGenVertexArrays(1, &lightCubeVAO);
     glGenBuffers(1, &lightVBO);
@@ -193,33 +200,19 @@ void App::Load()
     glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(lightVertices), lightVertices, GL_STATIC_DRAW);
 
-    glBindVertexArray(lightCubeVAO);
+  glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
 
-    // note that we update the lamp's position attribute's stride to reflect the updated buffer data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // load diffuse texture
-    diffuseMap = Engine::LoadPNGToGLTexture("assets/textures/container2.png", GL_RGBA, GL_RGBA);
-    // load specular texture
-    specularMap = Engine::LoadPNGToGLTexture("assets/textures/container2_specular.png", GL_RGBA, GL_RGBA);
-
-    // wireframe
-    // glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-    // fill
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    // start timer
-    previousTime = high_resolution_clock::now();
+  previousTime = high_resolution_clock::now();
 }
 
 void App::Loop()
 {
-    while (appState == AppState::ON)
-    {
-        currentTime = high_resolution_clock::now();
-        deltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - previousTime).count() / 1000000000.0;
-        previousTime = currentTime;
+  while (appState == AppState::ON)
+  {
+    currentTime = high_resolution_clock::now();
+    deltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - previousTime).count() / 1000000000.0;
+    previousTime = currentTime;
+    Engine::Log(std::to_string(deltaTime));
 
         Update();
         Draw();
@@ -267,6 +260,28 @@ void App::Update()
             SDL_SetRelativeMouseMode(SDL_FALSE);
         }
     }
+}
+void App::Update()
+{
+  if (inputManager.isKeyPressed(SDLK_w))
+  {
+    camera.ProcessKeyboard(Engine::Camera_Movement::FORWARD, deltaTime);
+  }
+
+  if (inputManager.isKeyPressed(SDLK_s))
+  {
+    camera.ProcessKeyboard(Engine::Camera_Movement::BACKWARD, deltaTime);
+  }
+
+  if (inputManager.isKeyPressed(SDLK_a))
+  {
+    camera.ProcessKeyboard(Engine::Camera_Movement::LEFT, deltaTime);
+  }
+
+  if (inputManager.isKeyPressed(SDLK_d))
+  {
+    camera.ProcessKeyboard(Engine::Camera_Movement::RIGHT, deltaTime);
+  }
 }
 void App::Draw()
 {

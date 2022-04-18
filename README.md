@@ -2,7 +2,8 @@
 
 git clone --recursive https://github.com/EricWRogers/learnopengl-class.git
 
- 
+git submodule update --init --recursive
+
 ## DEPENDENCES
 
 - LINUX

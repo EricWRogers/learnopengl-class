@@ -1,6 +1,5 @@
 #include "App.hpp"
 
-
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
@@ -48,52 +47,6 @@
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
     };
 
-        float lightVertices[] = {
-        // positions
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-
-        -0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f, -0.5f,
-
-        -0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f
-    };
-    
-
     // positions all containers
     glm::vec3 cubePositions[] = {
         glm::vec3( 0.0f,  0.0f,  0.0f),
@@ -130,11 +83,8 @@ App::~App()
 
 void App::Run()
 {
-
-  if (appState == AppState::ON)
-    Engine::FatalError("App already running.");
-  
-  previousTime = high_resolution_clock::now();
+    if (appState == AppState::ON)
+        Engine::FatalError("App already running.");
 
     Engine::Init();
 
@@ -146,8 +96,7 @@ void App::Run()
 
     window.Create("Engine", 800, 600, windowFlags);
 
-    SDL_CaptureMouse(SDL_TRUE);
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+    // Lock Mouse
 
     Load();
 
@@ -161,58 +110,21 @@ void App::Load()
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
 
+    // load shader
 
-    // build and compile our shader program
-    lightingShader.Compile("assets/shaders/6.multiple_lights.vs", "assets/shaders/6.multiple_lights.fs");
-    lightingShader.AddAttribute("aPos");
-    lightingShader.AddAttribute("aNormal");
-    lightingShader.AddAttribute("aTexCoords");
-    lightingShader.Link();
+    // load model
 
-    lightCubeShader.Compile("assets/shaders/6.light_cube.vs", "assets/shaders/6.light_cube.fs");
-    lightCubeShader.AddAttribute("aPos");
-    lightCubeShader.Link();
-
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &VBO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindVertexArray(cubeVAO);
-
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // texture coords
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-
-    // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-    glGenVertexArrays(1, &lightCubeVAO);
-    glGenBuffers(1, &lightVBO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(lightVertices), lightVertices, GL_STATIC_DRAW);
-
-  glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
-
-  previousTime = high_resolution_clock::now();
+    // start timer
+    previousTime = high_resolution_clock::now();
 }
 
 void App::Loop()
 {
-  while (appState == AppState::ON)
-  {
-    currentTime = high_resolution_clock::now();
-    deltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - previousTime).count() / 1000000000.0;
-    previousTime = currentTime;
-    Engine::Log(std::to_string(deltaTime));
+    while (appState == AppState::ON)
+    {
+        currentTime = high_resolution_clock::now();
+        deltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - previousTime).count() / 1000000000.0;
+        previousTime = currentTime;
 
         Update();
         Draw();
@@ -245,146 +157,20 @@ void App::Update()
         camera.ProcessKeyboard(Engine::Camera_Movement::RIGHT, deltaTime);
     }
 
-    if (inputManager.isKeyPressed(SDLK_ESCAPE))
-    {
-        mouseLock = !mouseLock;
-
-        if (mouseLock)
-        {
-            SDL_CaptureMouse(SDL_TRUE);
-            SDL_SetRelativeMouseMode(SDL_TRUE);
-        }
-        else
-        {
-            SDL_CaptureMouse(SDL_FALSE);
-            SDL_SetRelativeMouseMode(SDL_FALSE);
-        }
-    }
-}
-void App::Update()
-{
-  if (inputManager.isKeyPressed(SDLK_w))
-  {
-    camera.ProcessKeyboard(Engine::Camera_Movement::FORWARD, deltaTime);
-  }
-
-  if (inputManager.isKeyPressed(SDLK_s))
-  {
-    camera.ProcessKeyboard(Engine::Camera_Movement::BACKWARD, deltaTime);
-  }
-
-  if (inputManager.isKeyPressed(SDLK_a))
-  {
-    camera.ProcessKeyboard(Engine::Camera_Movement::LEFT, deltaTime);
-  }
-
-  if (inputManager.isKeyPressed(SDLK_d))
-  {
-    camera.ProcessKeyboard(Engine::Camera_Movement::RIGHT, deltaTime);
-  }
+    // Toggle Mouse Lock
 }
 void App::Draw()
 {
-    // render
-    // ------
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // be sure to activate shader when setting uniforms/drawing objects
-    lightingShader.Use();
-    lightingShader.SetVec3("viewPos", camera.Position);
-
-    /*
-        Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index 
-        the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
-        by defining light types as classes and set their values in there, or by using a more efficient uniform approach
-        by using 'Uniform buffer objects', but that is something we'll discuss in the 'Advanced GLSL' tutorial.
-    */
-    // directional light
-    lightingShader.SetVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-    lightingShader.SetVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-    lightingShader.SetVec3("dirLight.diffuse", 0.4f,  0.4f, 0.4f);
-    lightingShader.SetVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-    // point light 1
-    for(int index = 0; index < 4; index++)
-    {
-        lightingShader.SetVec3("pointLights[" + std::to_string(index) + "].position", pointLightPositions[index]);
-        lightingShader.SetVec3("pointLights[" + std::to_string(index) + "].ambient", 0.05f, 0.05f, 0.05f);
-        lightingShader.SetVec3("pointLights[" + std::to_string(index) + "].diffuse", 0.8f, 0.8f, 0.8f);
-        lightingShader.SetVec3("pointLights[" + std::to_string(index) + "].specular", 1.0f, 1.0f, 1.0f);
-        lightingShader.SetFloat("pointLights[" + std::to_string(index) + "].constant", 1.0f);
-        lightingShader.SetFloat("pointLights[" + std::to_string(index) + "].linear", 0.09f);
-        lightingShader.SetFloat("pointLights[" + std::to_string(index) + "].quadratic", 0.032f);
-    }
-    // spotLight
-    lightingShader.SetVec3("spotLight.position", camera.Position);
-    lightingShader.SetVec3("spotLight.direction", camera.Front);
-    lightingShader.SetVec3("spotLight.ambient", glm::vec3(0.0f));
-    lightingShader.SetVec3("spotLight.diffuse", glm::vec3(1.0f));
-    lightingShader.SetVec3("spotLight.specular", glm::vec3(1.0f));
-    lightingShader.SetFloat("spotLight.constant", 1.0f);
-    lightingShader.SetFloat("spotLight.linear", 1.0f);
-    lightingShader.SetFloat("spotLight.quadratic", 0.032f);
-    lightingShader.SetFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-    lightingShader.SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(20.0f)));
+    // don't forget to enable shader before setting uniforms
 
     // view/projection transformations
-    glm::mat4 projection = glm::perspective(
-        glm::radians(camera.Zoom), 
-        (float)window.GetScreenWidth() / (float)window.GetScreenHeight(), 
-        0.1f, 100.0f);
-    glm::mat4 view = camera.GetViewMatrix();
-    lightingShader.SetMat4("projection", projection);
-    lightingShader.SetMat4("view", view);
 
-    // world transformation
-    glm::mat4 model = glm::mat4(1.0f);
-    lightingShader.SetMat4("model", model);
+    // render the loaded model
 
-    // bind diffuse map
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, diffuseMap.id);
-    // bind specular map
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, specularMap.id);
-
-    // material properties
-    lightingShader.SetInt("material.diffuse", 0);
-    lightingShader.SetInt("material.specular", 1);
-    lightingShader.SetFloat("material.shininess", 32.0f);
-
-    // render containers
-    glBindVertexArray(cubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    for (unsigned int i = 0; i < 10; i++)
-    {
-        // calculate the model matrix for each object and pass it to shader before drawing
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, cubePositions[i]);
-        float angle = 20.0f * i;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-        lightingShader.SetMat4("model", model);
-
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
-    lightingShader.UnUse();
-
-    // also draw the lamp object
-    /*lightCubeShader.Use();
-    lightCubeShader.SetMat4("projection", projection);
-    lightCubeShader.SetMat4("view", view);
-    // we now draw as many light bulbs as we have point lights.
-    glBindVertexArray(lightCubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
-    for (unsigned int i = 0; i < 4; i++)
-    {
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, pointLightPositions[i]);
-        model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
-        lightCubeShader.SetMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
-    lightCubeShader.Use();*/
+    // unbind shader
 }
 
 void App::LateUpdate() {}
